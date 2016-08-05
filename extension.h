@@ -2,18 +2,31 @@
 #define _INCLUDE_EXTENSION_H_
 
 
+#include <map>
+
+
 #include "smsdk_ext.h"
 
 
 #include <icvar.h>
 #include <IStaticPropMgr.h>
 #include <ivmodelinfo.h>
+#include <fmtstr.h>
+
+
+#define DEBUG_LOG(...) \
+	if (cv_staticprop_debug.GetBool()) { \
+		g_pSM->LogMessage(myself, __VA_ARGS__); \
+	}
 
 
 /* Source interfaces */
 extern ICvar *icvar;
 extern IStaticPropMgrServer *staticpropmgr;
 extern IVModelInfo *modelinfo;
+
+/* console variables */
+extern ConVar cv_staticprop_debug;
 
 
 class ExtStaticProps : public SDKExtension, public IConCommandBaseAccessor

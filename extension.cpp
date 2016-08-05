@@ -11,6 +11,9 @@ ICvar *icvar                        = nullptr;
 IStaticPropMgrServer *staticpropmgr = nullptr;
 IVModelInfo *modelinfo              = nullptr;
 
+/* console variables */
+ConVar cv_staticprop_debug("staticprop_debug", "0", FCVAR_CHEAT, "Enable debug log messages from the StaticProps SM extension");
+
 
 bool ExtStaticProps::SDK_OnLoad(char *error, size_t maxlen, bool late)
 {
