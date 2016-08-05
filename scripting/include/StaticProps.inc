@@ -72,6 +72,10 @@ native int GetAllStaticPropsInAABB(int[] array, int array_max, const float mins[
 native int GetAllStaticPropsInOBB (int[] array, int array_max, const float origin[3], const float extent1[3], const float extent2[3], const float extent3[3]);
 
 
+// for testing: this uses sigsegv's own AABB filtering instead of directly calling Valve's GetAllStaticPropsInAABB
+native int GetAllStaticPropsInAABB_Alt(int[] array, int array_max, const float mins[3], const float maxs[3]);
+
+
 // pass in a static prop index, and get the requested information
 // the return value indicates whether the request was successful (false if the prop index is bad, etc)
 native bool StaticProp_GetMins          (int index, float mins[3]);                      // essentially: ICollideable::OBBMins()

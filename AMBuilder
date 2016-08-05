@@ -5,6 +5,7 @@ projectName = 'StaticProps'
 
 # smsdk_ext.cpp will be automatically added later
 sourceFiles = [
+  os.path.join('..', 'hl2sdk-sdk2013', 'public', 'collisionutils.cpp'),
   'extension.cpp',
   'sp_natives.cpp',
 ]

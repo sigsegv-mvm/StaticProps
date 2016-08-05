@@ -9,7 +9,7 @@
 /* Basic information exposed publicly */
 #define SMEXT_CONF_NAME			"StaticProps"
 #define SMEXT_CONF_DESCRIPTION	"SourcePawn interface for static prop information"
-#define SMEXT_CONF_VERSION		"20160805-1"
+#define SMEXT_CONF_VERSION		"20160805-2"
 #define SMEXT_CONF_AUTHOR		"sigsegv"
 #define SMEXT_CONF_URL			"https://github.com/sigsegv-mvm/"
 #define SMEXT_CONF_LOGTAG		"STATICPROPS"

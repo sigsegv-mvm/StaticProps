@@ -210,6 +210,53 @@ cell_t SP_GetAllStaticPropsInOBB(IPluginContext *pContext, const cell_t *params)
 }
 
 
+cell_t SP_GetAllStaticPropsInAABB_Alt(IPluginContext *pContext, const cell_t *params)
+{
+	const cell_t array_max = params[2];
+	cell_t *array; pContext->LocalToPhysAddr(params[1], &array);
+	cell_t *mins;  pContext->LocalToPhysAddr(params[3], &mins);
+	cell_t *maxs;  pContext->LocalToPhysAddr(params[4], &maxs);
+	
+	Vector vecMins = CellsToVector(mins);
+	Vector vecMaxs = CellsToVector(maxs);
+	
+	DEBUG_LOG("%s: [array: %p] [array_max: %d] [mins: %+5.0f %+5.0f %+5.0f] [maxs: %+5.0f %+5.0f %+5.0f]",
+		__FUNCTION__, array, array_max,
+		vecMins.x, vecMins.y, vecMins.z,
+		vecMaxs.x, vecMaxs.y, vecMaxs.z);
+	
+	CUtlVector<ICollideable *> props_all;
+	staticpropmgr->GetAllStaticProps(&props_all);
+	
+	CUtlVector<ICollideable *> props;
+	FOR_EACH_VEC(props_all, i) {
+		auto prop = props_all[i];
+		
+		const Vector& vecPropOrigin = prop->GetCollisionOrigin();
+		Vector vecPropMins = vecPropOrigin + prop->OBBMins();
+		Vector vecPropMaxs = vecPropOrigin + prop->OBBMaxs();
+		
+		if (IsBoxIntersectingBox(vecMins, vecMaxs, vecPropMins, vecPropMaxs)) {
+			props.AddToTail(prop);
+			DEBUG_LOG("%s: INCLUDED: prop #%d with [absmins: %+5.0f %+5.0f %+5.0f] [absmaxs: %+5.0f %+5.0f %+5.0f]",
+				__FUNCTION__, i, vecPropMins.x, vecPropMins.y, vecPropMins.z, vecPropMaxs.x, vecPropMaxs.y, vecPropMaxs.z);
+		} else {
+			DEBUG_LOG("%s: EXCLUDED: prop #%d with [absmins: %+5.0f %+5.0f %+5.0f] [absmaxs: %+5.0f %+5.0f %+5.0f]",
+				__FUNCTION__, i, vecPropMins.x, vecPropMins.y, vecPropMins.z, vecPropMaxs.x, vecPropMaxs.y, vecPropMaxs.z);
+		}
+	}
+	
+	int num_stored = 0;
+	for (int i = 0; i < props.Count() && i < array_max; ++i) {
+		array[num_stored++] = i;
+	}
+	
+	DEBUG_LOG("%s: got %d from engine, filtered down to %d, stored %d in array", __FUNCTION__, props_all.Count(), props.Count(), num_stored);
+	
+	return num_stored;
+}
+
+
 cell_t SP_StaticProp_GetMins(IPluginContext *pContext, const cell_t *params)
 {
 	const cell_t index = params[1];
@@ -378,8 +425,9 @@ cell_t SP_StaticProp_GetModelName(IPluginContext *pContext, const cell_t *params
 
 const sp_nativeinfo_t g_Natives[] = {
 	{ "GetAllStaticProps",            &SP_GetAllStaticProps            },
-	{ "GetAllStaticPropsInOBB",       &SP_GetAllStaticPropsInOBB       },
 	{ "GetAllStaticPropsInAABB",      &SP_GetAllStaticPropsInAABB      },
+	{ "GetAllStaticPropsInOBB",       &SP_GetAllStaticPropsInOBB       },
+	{ "GetAllStaticPropsInAABB_Alt",  &SP_GetAllStaticPropsInAABB_Alt  },
 	{ "StaticProp_GetMins",           &SP_StaticProp_GetMins           },
 	{ "StaticProp_GetMaxs",           &SP_StaticProp_GetMaxs           },
 	{ "StaticProp_GetOrigin",         &SP_StaticProp_GetOrigin         },

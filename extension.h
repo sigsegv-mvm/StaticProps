@@ -12,6 +12,7 @@
 #include <IStaticPropMgr.h>
 #include <ivmodelinfo.h>
 #include <fmtstr.h>
+#include <collisionutils.h>
 
 
 #define DEBUG_LOG(...) \
