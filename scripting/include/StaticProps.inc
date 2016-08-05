@@ -65,16 +65,14 @@ enum Collision_Group_t
 };
 
 
-// pass in an array, and it will be filled with static prop indexes
-// the return value indicates how many indexes were actually stored (0 <= retval <= array_max)
-native int GetAllStaticProps      (int[] array, int array_max);
-native int GetAllStaticPropsInAABB(int[] array, int array_max, const float mins[3], const float maxs[3]);
-native int GetAllStaticPropsInOBB (int[] array, int array_max, const float origin[3], const float extent1[3], const float extent2[3], const float extent3[3]);
+// returns the total number of static props in the current map
+// valid static prop indexes are therefore in the range [0, total-1]
+native int GetTotalNumberOfStaticProps();
 
-
-// for testing: this uses sigsegv's own AABB filtering instead of directly calling Valve's GetAllStaticPropsInAABB
-native int GetAllStaticPropsInAABB_Alt(int[] array, int array_max, const float mins[3], const float maxs[3]);
-
+// pass in an array and two world position vectors that represent a box
+// the array will be populated with the indexes of static props that overlap that box
+// the return value indicates how many indexes were actually stored in the array (0 <= retval <= array_max)
+native int GetIndexesOfStaticPropsOverlappingAABB(int[] array, int array_max, const float absmins[3], const float absmaxs[3]);
 
 // pass in a static prop index, and get the requested information
 // the return value indicates whether the request was successful (false if the prop index is bad, etc)

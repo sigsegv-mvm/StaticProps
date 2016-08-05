@@ -127,117 +127,43 @@ void QAngleToCells(const QAngle& ang, cell_t *cells)
 }
 
 
-cell_t SP_GetAllStaticProps(IPluginContext *pContext, const cell_t *params)
+cell_t SP_GetTotalNumberOfStaticProps(IPluginContext *pContext, const cell_t *params)
+{
+	CUtlVector<ICollideable *> props;
+	staticpropmgr->GetAllStaticProps(&props);
+	
+	DEBUG_LOG("%s: got %d static props from engine", __FUNCTION__, props.Count());
+	
+	return props.Count();
+}
+
+
+cell_t SP_GetIndexesOfStaticPropsOverlappingAABB(IPluginContext *pContext, const cell_t *params)
 {
 	const cell_t array_max = params[2];
 	cell_t *array; pContext->LocalToPhysAddr(params[1], &array);
+	cell_t *mins;  pContext->LocalToPhysAddr(params[3], &mins);
+	cell_t *maxs;  pContext->LocalToPhysAddr(params[4], &maxs);
 	
-	DEBUG_LOG("%s: [array: %p] [array_max: %d]", __FUNCTION__, array, array_max);
+	Vector vecMins = CellsToVector(mins);
+	Vector vecMaxs = CellsToVector(maxs);
+	
+	DEBUG_LOG("%s: [array: %p] [array_max: %d] [mins: %+5.0f %+5.0f %+5.0f] [maxs: %+5.0f %+5.0f %+5.0f]",
+		__FUNCTION__, array, array_max,
+		vecMins.x, vecMins.y, vecMins.z,
+		vecMaxs.x, vecMaxs.y, vecMaxs.z);
 	
 	CUtlVector<ICollideable *> props;
 	staticpropmgr->GetAllStaticProps(&props);
 	
-	int num_stored = 0;
-	for (int i = 0; i < props.Count() && i < array_max; ++i) {
-		array[num_stored++] = i;
-	}
-	
-	DEBUG_LOG("%s: got %d from engine, stored %d in array", __FUNCTION__, props.Count(), num_stored);
-	
-	return num_stored;
-}
-
-cell_t SP_GetAllStaticPropsInAABB(IPluginContext *pContext, const cell_t *params)
-{
-	const cell_t array_max = params[2];
-	cell_t *array; pContext->LocalToPhysAddr(params[1], &array);
-	cell_t *mins;  pContext->LocalToPhysAddr(params[3], &mins);
-	cell_t *maxs;  pContext->LocalToPhysAddr(params[4], &maxs);
-	
-	Vector vecMins = CellsToVector(mins);
-	Vector vecMaxs = CellsToVector(maxs);
-	
-	DEBUG_LOG("%s: [array: %p] [array_max: %d] [mins: %+5.0f %+5.0f %+5.0f] [maxs: %+5.0f %+5.0f %+5.0f]",
-		__FUNCTION__, array, array_max,
-		vecMins.x, vecMins.y, vecMins.z,
-		vecMaxs.x, vecMaxs.y, vecMaxs.z);
-	
-	CUtlVector<ICollideable *> props;
-	staticpropmgr->GetAllStaticPropsInAABB(vecMins, vecMaxs, &props);
-	
-	int num_stored = 0;
-	for (int i = 0; i < props.Count() && i < array_max; ++i) {
-		array[num_stored++] = i;
-	}
-	
-	DEBUG_LOG("%s: got %d from engine, stored %d in array", __FUNCTION__, props.Count(), num_stored);
-	
-	return num_stored;
-}
-
-cell_t SP_GetAllStaticPropsInOBB(IPluginContext *pContext, const cell_t *params)
-{
-	const cell_t array_max = params[2];
-	cell_t *array;   pContext->LocalToPhysAddr(params[1], &array);
-	cell_t *origin;  pContext->LocalToPhysAddr(params[3], &origin);
-	cell_t *extent1; pContext->LocalToPhysAddr(params[4], &extent1);
-	cell_t *extent2; pContext->LocalToPhysAddr(params[5], &extent2);
-	cell_t *extent3; pContext->LocalToPhysAddr(params[6], &extent3);
-	
-	Vector vecOrigin  = CellsToVector(origin);
-	Vector vecExtent1 = CellsToVector(extent1);
-	Vector vecExtent2 = CellsToVector(extent2);
-	Vector vecExtent3 = CellsToVector(extent3);
-	
-	DEBUG_LOG("%s: [array: %p] [array_max: %d] [origin: %+5.0f %+5.0f %+5.0f] [extent1: %+5.0f %+5.0f %+5.0f] [extent2: %+5.0f %+5.0f %+5.0f] [extent3: %+5.0f %+5.0f %+5.0f]",
-		__FUNCTION__, array, array_max,
-		vecOrigin.x, vecOrigin.y, vecOrigin.z,
-		vecExtent1.x, vecExtent1.y, vecExtent1.z,
-		vecExtent2.x, vecExtent2.y, vecExtent2.z,
-		vecExtent3.x, vecExtent3.y, vecExtent3.z);
-	
-	CUtlVector<ICollideable *> props;
-	staticpropmgr->GetAllStaticPropsInOBB(vecOrigin, vecExtent1, vecExtent2, vecExtent3, &props);
-	
-	int num_stored = 0;
-	for (int i = 0; i < props.Count() && i < array_max; ++i) {
-		array[num_stored++] = i;
-	}
-	
-	DEBUG_LOG("%s: got %d from engine, stored %d in array", __FUNCTION__, props.Count(), num_stored);
-	
-	return num_stored;
-}
-
-
-cell_t SP_GetAllStaticPropsInAABB_Alt(IPluginContext *pContext, const cell_t *params)
-{
-	const cell_t array_max = params[2];
-	cell_t *array; pContext->LocalToPhysAddr(params[1], &array);
-	cell_t *mins;  pContext->LocalToPhysAddr(params[3], &mins);
-	cell_t *maxs;  pContext->LocalToPhysAddr(params[4], &maxs);
-	
-	Vector vecMins = CellsToVector(mins);
-	Vector vecMaxs = CellsToVector(maxs);
-	
-	DEBUG_LOG("%s: [array: %p] [array_max: %d] [mins: %+5.0f %+5.0f %+5.0f] [maxs: %+5.0f %+5.0f %+5.0f]",
-		__FUNCTION__, array, array_max,
-		vecMins.x, vecMins.y, vecMins.z,
-		vecMaxs.x, vecMaxs.y, vecMaxs.z);
-	
-	CUtlVector<ICollideable *> props_all;
-	staticpropmgr->GetAllStaticProps(&props_all);
-	
-	CUtlVector<ICollideable *> props;
-	FOR_EACH_VEC(props_all, i) {
-		auto prop = props_all[i];
-		
-		const Vector& vecPropOrigin = prop->GetCollisionOrigin();
-		Vector vecPropMins = vecPropOrigin + prop->OBBMins();
-		Vector vecPropMaxs = vecPropOrigin + prop->OBBMaxs();
+	CUtlVector<int> indexes;
+	FOR_EACH_VEC(props, i) {
+		const Vector& vecPropOrigin = props[i]->GetCollisionOrigin();
+		Vector vecPropMins = vecPropOrigin + props[i]->OBBMins();
+		Vector vecPropMaxs = vecPropOrigin + props[i]->OBBMaxs();
 		
 		if (IsBoxIntersectingBox(vecMins, vecMaxs, vecPropMins, vecPropMaxs)) {
-			props.AddToTail(prop);
+			indexes.AddToTail(i);
 			DEBUG_LOG("%s: INCLUDED: prop #%d with [absmins: %+5.0f %+5.0f %+5.0f] [absmaxs: %+5.0f %+5.0f %+5.0f]",
 				__FUNCTION__, i, vecPropMins.x, vecPropMins.y, vecPropMins.z, vecPropMaxs.x, vecPropMaxs.y, vecPropMaxs.z);
 		} else {
@@ -247,11 +173,11 @@ cell_t SP_GetAllStaticPropsInAABB_Alt(IPluginContext *pContext, const cell_t *pa
 	}
 	
 	int num_stored = 0;
-	for (int i = 0; i < props.Count() && i < array_max; ++i) {
-		array[num_stored++] = i;
+	for (int i = 0; i < indexes.Count() && i < array_max; ++i) {
+		array[num_stored++] = indexes[i];
 	}
 	
-	DEBUG_LOG("%s: got %d from engine, filtered down to %d, stored %d in array", __FUNCTION__, props_all.Count(), props.Count(), num_stored);
+	DEBUG_LOG("%s: %d total props, filtered down to %d, stored %d prop indexes in array", __FUNCTION__, props.Count(), indexes.Count(), num_stored);
 	
 	return num_stored;
 }
@@ -424,17 +350,15 @@ cell_t SP_StaticProp_GetModelName(IPluginContext *pContext, const cell_t *params
 
 
 const sp_nativeinfo_t g_Natives[] = {
-	{ "GetAllStaticProps",            &SP_GetAllStaticProps            },
-	{ "GetAllStaticPropsInAABB",      &SP_GetAllStaticPropsInAABB      },
-	{ "GetAllStaticPropsInOBB",       &SP_GetAllStaticPropsInOBB       },
-	{ "GetAllStaticPropsInAABB_Alt",  &SP_GetAllStaticPropsInAABB_Alt  },
-	{ "StaticProp_GetMins",           &SP_StaticProp_GetMins           },
-	{ "StaticProp_GetMaxs",           &SP_StaticProp_GetMaxs           },
-	{ "StaticProp_GetOrigin",         &SP_StaticProp_GetOrigin         },
-	{ "StaticProp_GetAngles",         &SP_StaticProp_GetAngles         },
-	{ "StaticProp_GetSolidType",      &SP_StaticProp_GetSolidType      },
-	{ "StaticProp_GetSolidFlags",     &SP_StaticProp_GetSolidFlags     },
-	{ "StaticProp_GetCollisionGroup", &SP_StaticProp_GetCollisionGroup },
-	{ "StaticProp_GetModelName",      &SP_StaticProp_GetModelName      },
-	{ nullptr,                        nullptr                          },
+	{ "GetTotalNumberOfStaticProps",            &SP_GetTotalNumberOfStaticProps            },
+	{ "GetIndexesOfStaticPropsOverlappingAABB", &SP_GetIndexesOfStaticPropsOverlappingAABB },
+	{ "StaticProp_GetMins",                     &SP_StaticProp_GetMins                     },
+	{ "StaticProp_GetMaxs",                     &SP_StaticProp_GetMaxs                     },
+	{ "StaticProp_GetOrigin",                   &SP_StaticProp_GetOrigin                   },
+	{ "StaticProp_GetAngles",                   &SP_StaticProp_GetAngles                   },
+	{ "StaticProp_GetSolidType",                &SP_StaticProp_GetSolidType                },
+	{ "StaticProp_GetSolidFlags",               &SP_StaticProp_GetSolidFlags               },
+	{ "StaticProp_GetCollisionGroup",           &SP_StaticProp_GetCollisionGroup           },
+	{ "StaticProp_GetModelName",                &SP_StaticProp_GetModelName                },
+	{ nullptr,                                  nullptr                                    },
 };
