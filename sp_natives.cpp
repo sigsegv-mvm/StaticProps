@@ -183,10 +183,11 @@ cell_t SP_GetIndexesOfStaticPropsOverlappingAABB(IPluginContext *pContext, const
 }
 
 
-cell_t SP_StaticProp_GetMins(IPluginContext *pContext, const cell_t *params)
+cell_t SP_StaticProp_GetOBBBounds(IPluginContext *pContext, const cell_t *params)
 {
 	const cell_t index = params[1];
 	cell_t *mins; pContext->LocalToPhysAddr(params[2], &mins);
+	cell_t *maxs; pContext->LocalToPhysAddr(params[3], &maxs);
 	
 	ICollideable *collideable = staticpropmgr->GetStaticPropByIndex(index);
 	if (collideable == nullptr) {
@@ -195,18 +196,23 @@ cell_t SP_StaticProp_GetMins(IPluginContext *pContext, const cell_t *params)
 	}
 	
 	Vector vecMins = collideable->OBBMins();
+	Vector vecMaxs = collideable->OBBMaxs();
 	VectorToCells(vecMins, mins);
+	VectorToCells(vecMaxs, maxs);
 	
-	DEBUG_LOG("%s: [index: %d] [mins: %+5.0f %+5.0f %+5.0f]", __FUNCTION__,
-		index, vecMins.x, vecMins.y, vecMins.z);
+	DEBUG_LOG("%s: [index: %d] [mins: %+5.0f %+5.0f %+5.0f] [maxs: %+5.0f %+5.0f %+5.0f]", __FUNCTION__, index,
+		vecMins.x, vecMins.y, vecMins.z,
+		vecMaxs.x, vecMaxs.y, vecMaxs.z);
 	
 	return true;
 }
 
-cell_t SP_StaticProp_GetMaxs(IPluginContext *pContext, const cell_t *params)
+
+cell_t SP_StaticProp_GetWorldSpaceBounds(IPluginContext *pContext, const cell_t *params)
 {
 	const cell_t index = params[1];
-	cell_t *maxs; pContext->LocalToPhysAddr(params[2], &maxs);
+	cell_t *mins; pContext->LocalToPhysAddr(params[2], &mins);
+	cell_t *maxs; pContext->LocalToPhysAddr(params[3], &maxs);
 	
 	ICollideable *collideable = staticpropmgr->GetStaticPropByIndex(index);
 	if (collideable == nullptr) {
@@ -214,11 +220,14 @@ cell_t SP_StaticProp_GetMaxs(IPluginContext *pContext, const cell_t *params)
 		return false;
 	}
 	
-	Vector vecMaxs = collideable->OBBMaxs();
+	Vector vecMins, vecMaxs;
+	collideable->WorldSpaceSurroundingBounds(&vecMins, &vecMaxs);
+	VectorToCells(vecMins, mins);
 	VectorToCells(vecMaxs, maxs);
 	
-	DEBUG_LOG("%s: [index: %d] [maxs: %+5.0f %+5.0f %+5.0f]", __FUNCTION__,
-		index, vecMaxs.x, vecMaxs.y, vecMaxs.z);
+	DEBUG_LOG("%s: [index: %d] [mins: %+5.0f %+5.0f %+5.0f] [maxs: %+5.0f %+5.0f %+5.0f]", __FUNCTION__, index,
+		vecMins.x, vecMins.y, vecMins.z,
+		vecMaxs.x, vecMaxs.y, vecMaxs.z);
 	
 	return true;
 }
@@ -352,8 +361,8 @@ cell_t SP_StaticProp_GetModelName(IPluginContext *pContext, const cell_t *params
 const sp_nativeinfo_t g_Natives[] = {
 	{ "GetTotalNumberOfStaticProps",            &SP_GetTotalNumberOfStaticProps            },
 	{ "GetIndexesOfStaticPropsOverlappingAABB", &SP_GetIndexesOfStaticPropsOverlappingAABB },
-	{ "StaticProp_GetMins",                     &SP_StaticProp_GetMins                     },
-	{ "StaticProp_GetMaxs",                     &SP_StaticProp_GetMaxs                     },
+	{ "StaticProp_GetOBBBounds",                &SP_StaticProp_GetOBBBounds                },
+	{ "StaticProp_GetWorldSpaceBounds",         &SP_StaticProp_GetWorldSpaceBounds         },
 	{ "StaticProp_GetOrigin",                   &SP_StaticProp_GetOrigin                   },
 	{ "StaticProp_GetAngles",                   &SP_StaticProp_GetAngles                   },
 	{ "StaticProp_GetSolidType",                &SP_StaticProp_GetSolidType                },

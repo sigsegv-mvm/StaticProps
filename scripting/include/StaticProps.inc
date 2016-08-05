@@ -76,14 +76,14 @@ native int GetIndexesOfStaticPropsOverlappingAABB(int[] array, int array_max, co
 
 // pass in a static prop index, and get the requested information
 // the return value indicates whether the request was successful (false if the prop index is bad, etc)
-native bool StaticProp_GetMins          (int index, float mins[3]);                      // essentially: ICollideable::OBBMins()
-native bool StaticProp_GetMaxs          (int index, float maxs[3]);                      // essentially: ICollideable::OBBMaxs()
-native bool StaticProp_GetOrigin        (int index, float origin[3]);                    // essentially: ICollideable::GetCollisionOrigin()
-native bool StaticProp_GetAngles        (int index, float angles[3]);                    // essentially: ICollideable::GetCollisionAngles()
-native bool StaticProp_GetSolidType     (int index, SolidType_t& solid_type);            // essentially: ICollideable::GetSolid()
-native bool StaticProp_GetSolidFlags    (int index, SolidFlags_t& solid_flags);          // essentially: ICollideable::GetSolidFlags()
-native bool StaticProp_GetCollisionGroup(int index, Collision_Group_t& collision_group); // essentially: ICollideable::GetCollisionGroup()
-native bool StaticProp_GetModelName     (int index, char[] name, int name_max);          // essentially: IVModelInfo::GetModelName(ICollideable::GetCollisionModel())
+native bool StaticProp_GetOBBBounds       (int index, float mins[3], float maxs[3]);       // essentially: ICollideable::OBBMins() + ICollideable::OBBMaxs()
+native bool StaticProp_GetWorldSpaceBounds(int index, float mins[3], float maxs[3]);       // essentially: ICollideable::WorldSpaceSurroundingBounds()
+native bool StaticProp_GetOrigin          (int index, float origin[3]);                    // essentially: ICollideable::GetCollisionOrigin()
+native bool StaticProp_GetAngles          (int index, float angles[3]);                    // essentially: ICollideable::GetCollisionAngles()
+native bool StaticProp_GetSolidType       (int index, SolidType_t& solid_type);            // essentially: ICollideable::GetSolid()
+native bool StaticProp_GetSolidFlags      (int index, SolidFlags_t& solid_flags);          // essentially: ICollideable::GetSolidFlags()
+native bool StaticProp_GetCollisionGroup  (int index, Collision_Group_t& collision_group); // essentially: ICollideable::GetCollisionGroup()
+native bool StaticProp_GetModelName       (int index, char[] name, int name_max);          // essentially: IVModelInfo::GetModelName(ICollideable::GetCollisionModel())
 
 
 public Extension __ext_StaticProps = {
